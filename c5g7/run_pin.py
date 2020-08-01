@@ -28,13 +28,13 @@ def run() :
   inp.put_int("number_groups",                  7)
   #
   inp.put_str("inner_solver",                   "SI")
-  inp.put_int("inner_max_iters",                100)
+  inp.put_int("inner_max_iters",                1000)
   inp.put_dbl("inner_tolerance",                1e-9)
   inp.put_int("inner_print_level",              0)
   inp.put_int("inner_print_interval",           10)
   #
   inp.put_str("outer_solver",                   "GS")
-  inp.put_int("outer_max_iters",                100)
+  inp.put_int("outer_max_iters",                1000)
   inp.put_dbl("outer_tolerance",                1e-9)
   inp.put_int("outer_print_level",              0)
   inp.put_int("outer_print_interval",           1)
@@ -51,7 +51,7 @@ def run() :
   inp.put_str("bc_south",                       "reflect")
   inp.put_str("bc_north",                       "reflect")
   #
-  inp.put_str("quad_type",                      "quadruplerange")
+ # inp.put_str("quad_type",                      "quadruplerange")
   inp.put_int("quad_number_polar_octant",       5)
   inp.put_int("quad_number_azimuth_octant",     10)
   #
@@ -78,13 +78,16 @@ def run() :
   # Geometry
   #-----------------------------------------------------------------------------#
   pins = get_pins(7, True)
-  mesh = pins[3].mesh()
+  mesh = pins[1].mesh()
+  mat.display();
   #-----------------------------------------------------------------------------#
   # Solve
   #-----------------------------------------------------------------------------#
   start = time.time()
   solver = Eigen2D(inp, mat, mesh)
   solver.solve()
+
+
   print "elapsed = ", time.time() - start
   #-----------------------------------------------------------------------------#
   # Plot
