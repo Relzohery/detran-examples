@@ -70,82 +70,21 @@ def run(perturb=0, equation = 'transport') :
 
   # Options are: assemblyX for X=0,1,2,3 or coreX for X=0,1,2
   mesh = slab_reactor_geometry.get_mesh("core0")
+  mat = slab_reactor_materials.get_materials(perturb=0)
+  #------------------------------------------------------------------------------#
     
+  #------------------------------------------------------------------------------#
+  # Solve
+  #------------------------------------------------------------------------------#
+    
+  start = time.time()
+  solver = Eigen1D(inp, mat, mesh)
+  solver.solve()
+  elapsed = (time.time() - start)
+  print elapsed, " seconds"
 
       
-      
-  
-  
-  if perturb:
-      samples = 100
-      k = []
-      flux_0_samples = np.zeros((140, samples))
-      flux_1_samples = np.zeros((140, samples))
-      fission_density_samples = np.zeros((140, samples))
-
-      if equation == "transport":  
-          fname = "results_core0_transport";
-          
-      elif equation == "diffusion":
-        inp.put_str("equation",                   "diffusion")
-        fname = "results_core0_diff"
-        
-
-      for sample in range(samples):
-          print 'sample {}'.format(sample)
-          mat = slab_reactor_materials.get_materials(perturb=perturb)
-          mat.display()
-             
-    
-          #------------------------------------------------------------------------------#
-    
-          #------------------------------------------------------------------------------#
-          # Solve
-          #------------------------------------------------------------------------------#
-    
-          start = time.time()
-          solver = Eigen1D(inp, mat, mesh)
-          solver.solve()
-          elapsed = (time.time() - start)
-          print elapsed, " seconds"
-          print "***************************"
-      
-          
-          k.append(solver.state().eigenvalue())
-          fission_den = solver.fissionsource().density()
-          fission_density_sample = []
-          
-    
-          
-          flux_0 = solver.state().phi(0)
-          flux_0_sample = []
-          
-          flux_1 = solver.state().phi(1)
-          flux_1_sample = []
-          
-          print len(flux_0)
-    
-          
-          for i in range(len(fission_den)):
-              fission_density_sample.append(fission_den[i])          
-          
-          for i in range(len(flux_0)):
-              flux_0_sample.append(flux_0[i])
-              flux_1_sample.append(flux_1[i])
-              
-          fission_density_samples[:, sample] = fission_density_sample
-          flux_0_samples[:, sample] = flux_0_sample
-          flux_1_samples[:, sample] = flux_1_sample
-              
-      data = {'fission_density' : fission_density_samples, 
-              'flux_0': flux_0_samples,
-              'flux_1': flux_1_samples,
-              'k_eff': np.array(k)}
-    
-          
-      pickle.dump(data, open(fname + '.p', 'wb'))
-  
-
+         
 
 if __name__ == "__main__":
   Manager.initialize(sys.argv)
